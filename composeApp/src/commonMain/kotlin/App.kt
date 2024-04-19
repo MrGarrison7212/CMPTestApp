@@ -77,7 +77,7 @@ fun AppContent(homeViewModel: HomeViewModel) {
                             horizontalAlignment = Alignment.CenterHorizontally,
                             modifier = Modifier.fillMaxWidth()
                         ) {
-
+                            //Image()
                         }
                     }
                 }
