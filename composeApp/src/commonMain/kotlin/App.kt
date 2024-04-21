@@ -1,5 +1,9 @@
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.gestures.draggable
+import androidx.compose.foundation.gestures.rememberDraggableState
+import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -41,6 +45,7 @@ import cmptestapp.composeapp.generated.resources.Res
 import cmptestapp.composeapp.generated.resources.compose_multiplatform
 import com.seiko.imageloader.rememberImageActionPainter
 import com.seiko.imageloader.rememberImagePainter
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalResourceApi::class)
 @Composable
@@ -69,6 +74,7 @@ fun AppContent(homeViewModel: HomeViewModel) {
         }
 
         val scrollState = rememberLazyGridState()
+        val coroutineScope = rememberCoroutineScope()
 
         Column(
             verticalArrangement = Arrangement.Center,
@@ -78,7 +84,12 @@ fun AppContent(homeViewModel: HomeViewModel) {
             LazyVerticalGrid(
                 columns = GridCells.Fixed(cols),
                 state = scrollState,
-                contentPadding = PaddingValues(16.dp)
+                contentPadding = PaddingValues(16.dp),
+                modifier = Modifier.draggable(orientation = Orientation.Vertical, state = rememberDraggableState {delta ->
+                    coroutineScope.launch {
+                        scrollState.scrollBy(-delta)
+                    }
+                })
             ) {
 
                 item(span = { GridItemSpan(cols) }) {
@@ -123,13 +134,19 @@ fun AppContent(homeViewModel: HomeViewModel) {
                                 modifier = Modifier.height(130.dp).padding(8.dp),
                                 contentDescription = product.title
                             )
-                            Text(
-                                product.title.toString(),
-                                maxLines = 2,
-                                overflow = TextOverflow.Ellipsis,
-                                modifier = Modifier.padding(horizontal = 16.dp)
-                                    .heightIn(min = 40.dp)
-                            )
+                            Box(
+                                modifier = Modifier.fillMaxWidth(),
+                                contentAlignment = Alignment.CenterStart
+                            ) {
+                                Text(
+                                    product.title.toString(),
+                                    textAlign = TextAlign.Start,
+                                    maxLines = 2,
+                                    overflow = TextOverflow.Ellipsis,
+                                    modifier = Modifier.padding(horizontal = 16.dp)
+                                        .heightIn(min = 40.dp)
+                                )
+                            }
                             Spacer(modifier = Modifier.height(16.dp))
 
                             Box(
